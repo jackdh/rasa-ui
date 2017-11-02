@@ -1,11 +1,8 @@
-CREATE SCHEMA public
-AUTHORIZATION postgres;
+CREATE SCHEMA public AUTHORIZATION postgres;
 
-COMMENT ON SCHEMA public
-IS 'standard public schema';
+COMMENT ON SCHEMA public IS 'standard public schema';
 
 GRANT ALL ON SCHEMA public TO postgres;
-
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 /* Sequences */
@@ -293,10 +290,10 @@ TABLESPACE pg_default;
 
 /* Views */
 CREATE OR REPLACE VIEW public.intents_most_used AS
-select intent_name, agents.agent_id, agents.agent_name, grouped_intents.grp_intent_count from intents
-left outer join (select count(*) as grp_intent_count, intent_name as grp_intent,agent_id as grp_agent_id from nlu_parse_log
-group by (intent_name,agent_id)) as grouped_intents
-on intent_name = grouped_intents.grp_intent, agents where intents.agent_id=agents.agent_id  order by agents.agent_id;
+SELECT intents.intent_name, agents.agent_id, agents.agent_name, grouped_intents.grp_intent_count FROM intents
+LEFT JOIN ( SELECT count(*) AS grp_intent_count, nlu_parse_log.intent_name AS grp_intent, nlu_parse_log.agent_id AS grp_agent_id
+FROM nlu_parse_log GROUP BY nlu_parse_log.intent_name, nlu_parse_log.agent_id) grouped_intents ON intents.intent_name::text = grouped_intents.grp_intent::text, agents 
+WHERE intents.agent_id = agents.agent_id ORDER BY agents.agent_id;
 
 CREATE OR REPLACE VIEW public.avg_nlu_response_times_30_days AS
 select round(avg(nlu_response_time_ms)::integer,0),
