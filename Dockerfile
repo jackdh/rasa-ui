@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+ FROM ubuntu:16.04
 
 RUN apt-get update
 ## Install base environment
@@ -53,7 +53,14 @@ RUN python -m spacy download en
 RUN sed -r 's/("rasaserver": )"[^"]*"(.*)/\1"http:\/\/127.0.0.1:5000"\2/' -i package.json
 RUN sed -r 's/("postgresConnectionString": )"[^"]*"(.*)/\1"\/var\/run\/postgresql"\2/' -i package.json
 
+WORKDIR /opt/rasaui/web/src
+RUN npm install
+WORKDIR /opt/rasaui
+
 EXPOSE 5000
 EXPOSE 5001
+VOLUME /var/lib/postgresql
+
+ENV NAME RasaUI
 
 ENTRYPOINT bash -c 'hostname -I; service postgresql start && su rasaui -c "python -m rasa_nlu.server --pipeline spacy_sklearn & npm start"'
