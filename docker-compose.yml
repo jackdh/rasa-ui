@@ -1,7 +1,19 @@
 version: '3'
 services:
   rasa:
+    container_name: "rasa"
     build: .
     ports:
-     - "5000:5000"
-     - "5001:5001"
+      - "5000:5000"
+      - "5001:5001"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    container_name: "mongodb"
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/mongo/data:/data/db
